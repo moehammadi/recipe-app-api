@@ -7,9 +7,9 @@ from recipe import serializers
 
 
 class TagViewSet(
-    viewsets.GenericViewSet,
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin):
+                viewsets.GenericViewSet,
+                mixins.ListModelMixin,
+                mixins.CreateModelMixin):
     """
     Manages Tags in Database
     """
@@ -28,3 +28,28 @@ class TagViewSet(
         :return: Tag
         """
         serializer.save(user=self.request.user)
+
+
+class IngredientsViewSet(viewsets.GenericViewSet,
+                         mixins.ListModelMixin,
+                         mixins.CreateModelMixin):
+    """
+    Manages Ingredients in Database
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.IngredientSerializer
+    queryset = models.Ingredient.objects.all()
+
+    def get_queryset(self):
+        return self.queryset.filter(
+            user=self.request.user
+        ).order_by('-name')
+
+    def perform_create(self, serializer):
+        """
+        Creates a new ingredient
+        :param serializer:
+        :return: Ingredient
+        """
+        return serializer.save(user=self.request.user)

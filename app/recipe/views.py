@@ -6,50 +6,42 @@ from core import models
 from recipe import serializers
 
 
-class TagViewSet(
-                viewsets.GenericViewSet,
-                mixins.ListModelMixin,
-                mixins.CreateModelMixin):
+class BaseRecipeAttrViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin
+):
     """
-    Manages Tags in Database
+    Base Viewset for user owned recipe attributes
     """
     authentication_classes = (TokenAuthentication,)
-    serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
-    queryset = models.Tag.objects.all()
 
     def get_queryset(self):
+        """
+        Return objects for the current authenticated user only
+        """
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
     def perform_create(self, serializer):
         """
-        Create a new Tag
+        Create a new Object
         :param serializer:
-        :return: Tag
         """
         serializer.save(user=self.request.user)
 
 
-class IngredientsViewSet(viewsets.GenericViewSet,
-                         mixins.ListModelMixin,
-                         mixins.CreateModelMixin):
+class TagViewSet(BaseRecipeAttrViewSet):
+    """
+    Manages Tags in Database
+    """
+    serializer_class = serializers.TagSerializer
+    queryset = models.Tag.objects.all()
+
+
+class IngredientsViewSet(BaseRecipeAttrViewSet):
     """
     Manages Ingredients in Database
     """
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.IngredientSerializer
     queryset = models.Ingredient.objects.all()
-
-    def get_queryset(self):
-        return self.queryset.filter(
-            user=self.request.user
-        ).order_by('-name')
-
-    def perform_create(self, serializer):
-        """
-        Creates a new ingredient
-        :param serializer:
-        :return: Ingredient
-        """
-        return serializer.save(user=self.request.user)

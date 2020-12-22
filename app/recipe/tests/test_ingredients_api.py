@@ -71,7 +71,7 @@ class PrivateIngredientsApiTest(TestCase):
         """
 
         Ingredient.objects.create(name='Salt', user=self.user)
-        Ingredient.objects.create(name='Pepper', user=self.user)
+        Ingredient.objects.create(name='Lettuce', user=self.user)
         Ingredient.objects.create(name='Lemon', user=self.user)
 
         ingredients = Ingredient.objects \
